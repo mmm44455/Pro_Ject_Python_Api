@@ -81,7 +81,7 @@
     },
     {
         "id": "dfab4ac0.2cf2b",
-        "type": "sqlitedb",
+        "type": "MSSQL-PLUS",
         "z": "",
         "db": "/path/to/your/database.db",
         "mode": "RWC"
