@@ -1,0 +1,89 @@
+[
+    {
+        "id": "4c9c2e8d.6c2c5",
+        "type": "inject",
+        "z": "7f1dc529.2a6e7",
+        "name": "Trigger",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 140,
+        "wires": [
+            [
+                "63e0f2a2.458f18"
+            ]
+        ]
+    },
+    {
+        "id": "63e0f2a2.458f18",
+        "type": "http request",
+        "z": "7f1dc529.2a6e7",
+        "name": "Call API",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": false,
+        "url": "http://127.0.0.1:8000/api/get_sensor_data",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 320,
+        "y": 140,
+        "wires": [
+            [
+                "9d6a2e44.0a93d"
+            ]
+        ]
+    },
+    {
+        "id": "9d6a2e44.0a93d",
+        "type": "function",
+        "z": "7f1dc529.2a6e7",
+        "name": "Process Data",
+        "func": "var sensorData = msg.payload;\nvar sqlQuery = `INSERT INTO SensorHistory (SID, Value, Time) VALUES (${sensorData.SID}, ${sensorData.Value}, '${sensorData.Time}')`;\nmsg.topic = sqlQuery;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 520,
+        "y": 140,
+        "wires": [
+            [
+                "1d524f68.77a898"
+            ]
+        ]
+    },
+    {
+        "id": "1d524f68.77a898",
+        "type": "sqlite",
+        "z": "7f1dc529.2a6e7",
+        "mydb": "dfab4ac0.2cf2b",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "SQLITE",
+        "x": 720,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "dfab4ac0.2cf2b",
+        "type": "sqlitedb",
+        "z": "",
+        "db": "/path/to/your/database.db",
+        "mode": "RWC"
+    }
+]
