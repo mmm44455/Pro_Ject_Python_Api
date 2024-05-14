@@ -1,9 +1,80 @@
 [
     {
-        "id": "4c9c2e8d.6c2c5",
+        "id": "91b495f8a87d95e7",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "3babad9404679348",
+        "type": "MSSQL",
+        "z": "91b495f8a87d95e7",
+        "mssqlCN": "3a543b749de2482d",
+        "name": "",
+        "outField": "payload",
+        "returnType": 0,
+        "throwErrors": 1,
+        "query": "\r\n",
+        "modeOpt": "queryMode",
+        "modeOptType": "query",
+        "queryOpt": "payload",
+        "queryOptType": "msg",
+        "paramsOpt": "",
+        "paramsOptType": "none",
+        "rows": "rows",
+        "rowsType": "msg",
+        "parseMustache": true,
+        "params": [],
+        "x": 560,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ba4b0ec65b4ebab8",
+        "type": "debug",
+        "z": "91b495f8a87d95e7",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "c529dd6a3e5e523f",
+        "type": "function",
+        "z": "91b495f8a87d95e7",
+        "name": "function 2",
+        "func": "var data = msg.payload;\nvar queries = [];\n\nfor (var i = 0; i < data.length; i++) {\n    var row = data[i];\n    var query = `INSERT INTO SensorHistory (ID, SID, Value, Time) VALUES (${row.ID}, ${row.SID}, ${row.Value}, '${row.Time}')`;\n    queries.push(query);\n}\n\nmsg.payload = queries;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 60,
+        "wires": [
+            [
+                "3babad9404679348"
+            ]
+        ]
+    },
+    {
+        "id": "95a8037c4bac54d8",
         "type": "inject",
-        "z": "7f1dc529.2a6e7",
-        "name": "Trigger",
+        "z": "91b495f8a87d95e7",
+        "name": "",
         "props": [
             {
                 "p": "payload"
@@ -13,7 +84,7 @@
                 "vt": "str"
             }
         ],
-        "repeat": "10",
+        "repeat": "",
         "crontab": "",
         "once": true,
         "onceDelay": 0.1,
@@ -21,69 +92,131 @@
         "payload": "",
         "payloadType": "date",
         "x": 130,
-        "y": 140,
+        "y": 160,
         "wires": [
             [
-                "63e0f2a2.458f18"
+                "f59a1e25728ee396"
             ]
         ]
     },
     {
-        "id": "63e0f2a2.458f18",
+        "id": "f59a1e25728ee396",
         "type": "http request",
-        "z": "7f1dc529.2a6e7",
-        "name": "Call API",
+        "z": "91b495f8a87d95e7",
+        "name": "",
         "method": "GET",
-        "ret": "obj",
-        "paytoqs": false,
-        "url": "http://127.0.0.1:8000/api/get_sensor_data",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://127.0.0.1:8000/api/data",
         "tls": "",
         "persist": false,
         "proxy": "",
+        "insecureHTTPParser": false,
         "authType": "",
-        "x": 320,
-        "y": 140,
+        "senderr": false,
+        "headers": [],
+        "x": 250,
+        "y": 240,
         "wires": [
             [
-                "9d6a2e44.0a93d"
+                "c529dd6a3e5e523f",
+                "ba4b0ec65b4ebab8"
             ]
         ]
     },
     {
-        "id": "9d6a2e44.0a93d",
+        "id": "75eb3697f3decbe3",
+        "type": "http in",
+        "z": "91b495f8a87d95e7",
+        "name": "",
+        "url": "/select",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 340,
+        "wires": [
+            [
+                "7571a1b6060a18d5"
+            ]
+        ]
+    },
+    {
+        "id": "7571a1b6060a18d5",
         "type": "function",
-        "z": "7f1dc529.2a6e7",
-        "name": "Process Data",
-        "func": "var sensorData = msg.payload;\nvar sqlQuery = `INSERT INTO SensorHistory (SID, Value, Time) VALUES (${sensorData.SID}, ${sensorData.Value}, '${sensorData.Time}')`;\nmsg.topic = sqlQuery;\nreturn msg;",
+        "z": "91b495f8a87d95e7",
+        "name": "function 3",
+        "func": "var query = `select * from SensorHistory \n`\nmsg.topic = query\nreturn msg;",
         "outputs": 1,
+        "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
-        "x": 520,
-        "y": 140,
+        "libs": [],
+        "x": 300,
+        "y": 340,
         "wires": [
             [
-                "1d524f68.77a898"
+                "5486e7635e647de9"
             ]
         ]
     },
     {
-        "id": "1d524f68.77a898",
-        "type": "sqlite",
-        "z": "7f1dc529.2a6e7",
-        "mydb": "dfab4ac0.2cf2b",
-        "sqlquery": "msg.topic",
-        "sql": "",
-        "name": "SQLITE",
-        "x": 720,
-        "y": 140,
+        "id": "5486e7635e647de9",
+        "type": "MSSQL",
+        "z": "91b495f8a87d95e7",
+        "mssqlCN": "3a543b749de2482d",
+        "name": "",
+        "outField": "payload",
+        "returnType": 0,
+        "throwErrors": 1,
+        "query": "",
+        "modeOpt": "queryMode",
+        "modeOptType": "query",
+        "queryOpt": "topic",
+        "queryOptType": "msg",
+        "paramsOpt": "payload",
+        "paramsOptType": "msg",
+        "rows": "rows",
+        "rowsType": "msg",
+        "parseMustache": true,
+        "params": [],
+        "x": 340,
+        "y": 440,
+        "wires": [
+            [
+                "7be1a5d341f9f64b"
+            ]
+        ]
+    },
+    {
+        "id": "7be1a5d341f9f64b",
+        "type": "http response",
+        "z": "91b495f8a87d95e7",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 550,
+        "y": 380,
         "wires": []
     },
     {
-        "id": "dfab4ac0.2cf2b",
-        "type": "MSSQL-PLUS",
-        "z": "",
-        "db": "/path/to/your/database.db",
-        "mode": "RWC"
+        "id": "3a543b749de2482d",
+        "type": "MSSQL-CN",
+        "tdsVersion": "7_4",
+        "name": "Thêm dữ liệu",
+        "server": "DUYCAO",
+        "port": "1433",
+        "encyption": true,
+        "trustServerCertificate": true,
+        "database": "DEMO_IOT",
+        "useUTC": true,
+        "connectTimeout": "15000",
+        "requestTimeout": "15000",
+        "cancelTimeout": "5000",
+        "pool": "5",
+        "parseJSON": false,
+        "enableArithAbort": true,
+        "readOnlyIntent": false
     }
 ]
