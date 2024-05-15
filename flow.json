@@ -21,16 +21,18 @@
         "modeOptType": "query",
         "queryOpt": "payload",
         "queryOptType": "msg",
-        "paramsOpt": "",
-        "paramsOptType": "none",
+        "paramsOpt": "queryParams",
+        "paramsOptType": "msg",
         "rows": "rows",
         "rowsType": "msg",
-        "parseMustache": true,
+        "parseMustache": false,
         "params": [],
-        "x": 560,
-        "y": 120,
+        "x": 740,
+        "y": 140,
         "wires": [
-            []
+            [
+                "ba4b0ec65b4ebab8"
+            ]
         ]
     },
     {
@@ -46,8 +48,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 500,
-        "y": 240,
+        "x": 680,
+        "y": 260,
         "wires": []
     },
     {
@@ -55,15 +57,15 @@
         "type": "function",
         "z": "91b495f8a87d95e7",
         "name": "function 2",
-        "func": "var data = msg.payload;\nvar queries = [];\n\nfor (var i = 0; i < data.length; i++) {\n    var row = data[i];\n    var query = `INSERT INTO SensorHistory (ID, SID, Value, Time) VALUES (${row.ID}, ${row.SID}, ${row.Value}, '${row.Time}')`;\n    queries.push(query);\n}\n\nmsg.payload = queries;\nreturn msg;\n",
+        "func": "var jsonData = msg.payload;\n\n// Kiểm tra nếu dữ liệu không phải là một chuỗi\nif (typeof jsonData === 'string') {\n    try {\n        jsonData = JSON.parse(jsonData);\n    } catch (e) {\n        node.error(\"Không thể parse dữ liệu JSON: \" + e);\n        return null;\n    }\n}\n\n// Kiểm tra nếu dữ liệu không phải là một mảng JSON\nif (!Array.isArray(jsonData)) {\n    node.error(\"Dữ liệu không hợp lệ. Yêu cầu một mảng JSON.\");\n    return null;\n}\n\n// Lặp qua từng bản ghi JSON trong mảng và tạo câu lệnh SQL hoàn chỉnh\nvar sqlStatements = jsonData.map(item => {\n    var query = `INSERT INTO SensorHistory (SID, Value, [Time]) VALUES (${item.SID}, ${item.Value}, '${item.Time}')`;\n    return query;\n});\n\n// Gộp tất cả các câu lệnh SQL thành một chuỗi để thực hiện nhiều câu lệnh cùng một lúc\nmsg.payload = sqlStatements.join(\";\\n\");\n\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 400,
-        "y": 60,
+        "x": 520,
+        "y": 120,
         "wires": [
             [
                 "3babad9404679348"
@@ -115,12 +117,11 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 250,
-        "y": 240,
+        "x": 270,
+        "y": 220,
         "wires": [
             [
-                "c529dd6a3e5e523f",
-                "ba4b0ec65b4ebab8"
+                "a121ae65d77f6d23"
             ]
         ]
     },
@@ -199,6 +200,22 @@
         "x": 550,
         "y": 380,
         "wires": []
+    },
+    {
+        "id": "a121ae65d77f6d23",
+        "type": "json",
+        "z": "91b495f8a87d95e7",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 350,
+        "y": 80,
+        "wires": [
+            [
+                "c529dd6a3e5e523f"
+            ]
+        ]
     },
     {
         "id": "3a543b749de2482d",
