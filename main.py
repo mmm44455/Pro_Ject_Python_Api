@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import random
 from fastapi.middleware.cors import CORSMiddleware
 import requests
+from datetime import datetime
 app = FastAPI()
 
 # Allow CORS for development
@@ -14,10 +15,11 @@ app.add_middleware(
 
 @app.get("/api/data")
 def get_data():
+    current_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')  # Định dạng thời gian ISO 8601
     # Example of generating random data
     data = [
-        {"ID": i, "SID": random.randint(1, 10), "Value": random.uniform(20.0, 30.0), "Time": "2024-05-12T21:21:18.000Z"}
-        for i in range(10)
+        { "SID": random.randint(1, 2), "Value": random.uniform(20.0, 30.0), "Time": current_time}
+        for _ in range(10)
     ]
     return data
 @app.get("/api/get_sensor_data")
